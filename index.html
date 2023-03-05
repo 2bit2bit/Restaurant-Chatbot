@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
     <title>Resturant chatbot</title>
     <style>
       * {
@@ -141,7 +140,6 @@
       }
 
       footer {
-        
         background-color: rgb(27, 27, 27);
         text-align: center;
         font-size: 0.8rem;
@@ -182,6 +180,8 @@
       var form = document.getElementById("form");
       var input = document.getElementById("input");
 
+      const lineBreak = document.createElement("br");
+
       form.addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -201,10 +201,16 @@
       });
 
       socket.on("chat message", function (msg) {
-        let item = document.createElement("li");
-        item.textContent = msg;
-        item.classList.add("chat-bot");
-        messages.appendChild(item);
+        msg = msg.split("\n");
+        let li = document.createElement("li");
+        li.classList.add("chat-bot");
+        msg.forEach((element) => {
+          li.insertAdjacentHTML(
+            "beforeend",
+            `${element}</br>`
+          );
+        });
+        messages.appendChild(li);
         messages.scrollTo(0, messages.scrollHeight);
       });
     </script>
