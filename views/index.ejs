@@ -116,20 +116,25 @@
         flex-direction: column;
       }
       #messages > li {
+        display: block;
+        width: fit-content;
+        max-width: 85%;
         padding: 0.5rem 1rem;
         border-radius: 8px;
-        margin: 6px;
-        width: fit-content;
+        margin: 6px;    
+        word-wrap: break-word;   
       }
 
       .chat-bot {
         text-align: left;
         background-color: #eee;
+        box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2); 
       }
 
       .chat-user {
         background-color: #fa7318;
         color: #fff;
+        box-shadow: -2px 2px 2px rgba(0, 0, 0, 0.2); 
         text-align: right;
         align-self: flex-end;
       }
@@ -162,7 +167,7 @@
     <main>
       <section class="chat">
         <header>Chatbot</header>
-        <ul id="messages"></ul>
+        <ul id="messages"><li class="chat-bot">e</li></ul>
         <form id="form" action="">
           <input id="input" type="number" /><button>Send</button>
         </form>
