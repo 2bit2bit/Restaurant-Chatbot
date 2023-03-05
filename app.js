@@ -17,42 +17,44 @@ const store = new MongoDBStore({
   collection: "mySessions",
 });
 
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET || "keyboard cat",
+  resave: false,
+  saveUninitialized: true,
+  store: store,
+});
 const PORT = process.env.PORT || 8080;
 
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "keyboard cat",
-    resave: false,
-    saveUninitialized: true,
-    store: store,
-  })
-);
+app.use(sessionMiddleware);
+io.engine.use(sessionMiddleware);
 
 app.get("/", (req, res) => {
-  req.session.user = "user";
-  console.log(req.session);
   res.render("index");
-  req.session.save();
 });
 
 io.on("connection", (socket) => {
-  //if sesion dosent already exist then send the message to the user
+  let userData;
+  const req = socket.request;
 
-  socket.emit(
-    "chat message",
-    `Hi!, I am chat bot, this is your connection id:${socket.id}`
-  );
+  if (req.session.userData) {
+    userData = req.session.userData;
+    socket.emit("chat message", `Old user with id: ${req.sessionID}`);
+  } else {
+    userData = [];
+    socket.emit("chat message", `New user with id: ${req.sessionID}`);
+  }
 
   socket.on("chat message", function (msg) {
-    // console.log(msg)
+    //process the mesage, and return a response
     socket.emit("chat message", `user sends ${msg}`);
+    userData.push(msg);
   });
 
   socket.on("disconnect", () => {
-    //store chat session orders and the rest of the data
-    console.log("user disconnected");
+    req.session.userData = userData;
+    req.session.save();
   });
 });
 
