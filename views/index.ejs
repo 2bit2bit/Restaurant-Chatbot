@@ -129,6 +129,7 @@
 
       .chat-user {
         background-color: #fa7318;
+        color: #fff;
         text-align: right;
         align-self: flex-end;
       }
@@ -161,18 +162,7 @@
     <main>
       <section class="chat">
         <header>Chatbot</header>
-        <ul id="messages">
-          <li class="chat-bot">Hi, I am a chatbot</li>
-          <li class="chat-bot">
-            Select 1 to Place an order<br />
-            Select 99 to checkout order<br />
-            Select 98 to see order history<br />
-            Select 97 to see current order<br />
-            Select 0 to cancel order
-          </li>
-          <!-- <li class="chat-user">What would you like to do?</li> -->
-          
-        </ul>
+        <ul id="messages"></ul>
         <form id="form" action="">
           <input id="input" type="number" /><button>Send</button>
         </form>
@@ -182,7 +172,7 @@
       <a href="https://github.com/2bit2bit/Restaurant-Chatbot">Github Link</a>
     </footer>
 
-    <!-- <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
       var socket = io();
 
@@ -193,17 +183,25 @@
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         if (input.value) {
+          console.log(input.value);
           socket.emit("chat message", input.value);
+          let item = document.createElement("li");
+          item.textContent = input.value;
+          item.classList.add("chat-user");
+          messages.appendChild(item);
+          messages.scrollTo(0, messages.scrollHeight);
           input.value = "";
         }
       });
 
       socket.on("chat message", function (msg) {
-        var item = document.createElement("li");
+        let item = document.createElement("li");
         item.textContent = msg;
+        item.classList.add("chat-bot");
         messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+        messages.scrollTo(0, messages.scrollHeight);
       });
-    </script> -->
+
+    </script>
   </body>
 </html>
