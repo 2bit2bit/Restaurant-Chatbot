@@ -43,7 +43,7 @@
         width: 100%;
         height: 100%;
         opacity: 0.6;
-        background-image: url("./img/backgroung.jpg");
+        background-image: url("https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=630&amp;h=375&amp");
         background-repeat: no-repeat;
         background-size: cover;
       }
@@ -121,20 +121,20 @@
         max-width: 85%;
         padding: 0.5rem 1rem;
         border-radius: 8px;
-        margin: 6px;    
-        word-wrap: break-word;   
+        margin: 6px;
+        word-wrap: break-word;
       }
 
       .chat-bot {
         text-align: left;
         background-color: #eee;
-        box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2); 
+        box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
       }
 
       .chat-user {
         background-color: #fa7318;
         color: #fff;
-        box-shadow: -2px 2px 2px rgba(0, 0, 0, 0.2); 
+        box-shadow: -2px 2px 2px rgba(0, 0, 0, 0.2);
         text-align: right;
         align-self: flex-end;
       }
@@ -167,7 +167,7 @@
     <main>
       <section class="chat">
         <header>Chatbot</header>
-        <ul id="messages"><li class="chat-bot">e</li></ul>
+        <ul id="messages"></ul>
         <form id="form" action="">
           <input id="input" type="number" /><button>Send</button>
         </form>
@@ -187,15 +187,19 @@
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        if (input.value) {
-          console.log(input.value);
-          socket.emit("chat message", input.value);
-          let item = document.createElement("li");
-          item.textContent = input.value;
-          item.classList.add("chat-user");
-          messages.appendChild(item);
-          messages.scrollTo(0, messages.scrollHeight);
-          input.value = "";
+
+        if (socket.connected) {
+          if (input.value) {
+            socket.emit("chat message", input.value);
+            let item = document.createElement("li");
+            item.textContent = input.value;
+            item.classList.add("chat-user");
+            messages.appendChild(item);
+            messages.scrollTo(0, messages.scrollHeight);
+            input.value = "";
+          }
+        } else {
+          alert("Connection lost, please refresh the page.");
         }
       });
 
@@ -206,7 +210,6 @@
         messages.appendChild(item);
         messages.scrollTo(0, messages.scrollHeight);
       });
-
     </script>
   </body>
 </html>
