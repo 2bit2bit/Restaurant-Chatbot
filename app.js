@@ -25,14 +25,15 @@ const sessionMiddleware = session({
 });
 const PORT = process.env.PORT || 8080;
 
-app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(sessionMiddleware);
 io.engine.use(sessionMiddleware);
 
 app.get("/", (req, res) => {
-  res.render("index");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
+
+const botResponse = require("./modules/botResponse");
 
 io.on("connection", (socket) => {
   let userData;
@@ -40,16 +41,14 @@ io.on("connection", (socket) => {
 
   if (req.session.userData) {
     userData = req.session.userData;
-    socket.emit("chat message", `Old user with id: ${req.sessionID}`);
   } else {
-    userData = [];
-    socket.emit("chat message", `New user with id: ${req.sessionID}`);
+    userData = { order: [] };
   }
 
+  socket.emit("chat message", botResponse.response().message);
+
   socket.on("chat message", function (msg) {
-    //process the mesage, and return a response
-    socket.emit("chat message", `user sends ${msg}`);
-    userData.push(msg);
+    socket.emit("chat message", botResponse.response(msg).message );
   });
 
   socket.on("disconnect", () => {

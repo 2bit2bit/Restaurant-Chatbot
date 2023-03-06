@@ -1,7 +1,11 @@
+const { json } = require('express');
+const fs = require('fs')
+const path = require('path')
+
 class Node {
-  constructor(index, data, parent) {
+  constructor(index, method, parent) {
     this.index = index;
-    this.data = data;
+    this.method = method;
     this.parent = parent;
     this.children = {};
   }
@@ -13,28 +17,56 @@ class Node {
 }
 
 class DecisionGraph {
-  constructor() {
-    this.root = new Node(null, "root", null);
+  constructor(method) {
+    this.root = new Node(null, method, null);
   }
 }
 
-const responseGraph = new DecisionGraph();
+const responseGraph = new DecisionGraph(start);
 
 responseGraph.root.addChild(0, "Cancel");
-responseGraph.root.addChild(1, "List Name");
+responseGraph.root.addChild(1, listItem);
 responseGraph.root.addChild(99, "Checkout");
 responseGraph.root.addChild(98, "Order History");
-responseGraph.root.addChild(97, "Current order");   
+responseGraph.root.addChild(97, "Current order");
 
-responseGraph.root.children[1].addChild(0, responseGraph.root[0])
-responseGraph.root.children[1].addChild(1, 'food item')
-responseGraph.root.children[1].addChild(99, responseGraph.root.children[1])
+responseGraph.root.children[1].addChild(0, responseGraph.root[0]);
+responseGraph.root.children[1].addChild(1, "food item");
+responseGraph.root.children[1].addChild(99, responseGraph.root.children[1]);
 
-responseGraph.root.children[98].addChild(99, responseGraph.root.children[98])
-
-console.log(responseGraph.root.children[98]);
-
+responseGraph.root.children[98].addChild(99, responseGraph.root.children[98]);
 
 module.exports = {
-    responseGraph
-} 
+  responseGraph,
+};
+
+// console.log(responseGraph.root.method())
+
+/// various method
+
+function start() {
+  message = [
+    "Select 1 to Place an order",
+    "Select 99 to checkout order",
+    "Select 98 to see order history",
+    "Select 97 to see current order",
+    "Select 0 to cancel order",
+  ];
+
+  return { message };
+}
+
+function listItem() {
+  let items = JSON.parse(fs.readFileSync(path.join( __dirname, '../','data', 'item.json'), 'utf8'))
+
+  let message = []
+  items.forEach((item, index) => {
+    message.push(`select ${index} for ${item.name} @${item.price}`)
+  });
+
+  // add the elements to graph node, implement remove to remove them
+  
+  return {message}
+}
+
+listItem()

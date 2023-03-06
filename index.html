@@ -159,10 +159,12 @@
   </head>
   <body>
     <nav>FOODIE</nav>
-    <main>
+    <main>  
       <section class="chat">
         <header>Chatbot</header>
-        <ul id="messages"></ul>
+        <ul id="messages">
+          <li class="chat-bot">Hi!, I am chatbot</li>
+        </ul>
         <form id="form" action="">
           <input id="input" type="number" /><button>Send</button>
         </form>
@@ -201,7 +203,6 @@
       });
 
       socket.on("chat message", function (msg) {
-        msg = msg.split("\n");
         let li = document.createElement("li");
         li.classList.add("chat-bot");
         msg.forEach((element) => {
