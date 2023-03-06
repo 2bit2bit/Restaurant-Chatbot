@@ -24,14 +24,14 @@ class DecisionGraph {
 
 const responseGraph = new DecisionGraph(start);
 
-responseGraph.root.addChild(0, "Cancel");
+responseGraph.root.addChild(0, cancel);
 responseGraph.root.addChild(1, listItem);
-responseGraph.root.addChild(99, "Checkout");
-responseGraph.root.addChild(98, "Order History");
-responseGraph.root.addChild(97, "Current order");
+responseGraph.root.addChild(99, checkout);
+responseGraph.root.addChild(98, orderHistory);
+responseGraph.root.addChild(97, currentOrder);
 
 responseGraph.root.children[1].addChild(0, responseGraph.root[0]);
-responseGraph.root.children[1].addChild(1, "food item");
+responseGraph.root.children[1].addChild(1, itemSelect);
 responseGraph.root.children[1].addChild(99, responseGraph.root.children[1]);
 
 responseGraph.root.children[98].addChild(99, responseGraph.root.children[98]);
@@ -52,9 +52,37 @@ function start() {
     "Select 97 to see current order",
     "Select 0 to cancel order",
   ];
-
   return { message };
 }
+
+function cancel() {
+  let message = ['Cancel']  
+  return {message}
+}
+
+function checkout() {
+  let message = ['checkout']  
+  return {message}
+}
+
+function orderHistory() {
+  let message = ['orderHistory']  
+  return {message}
+}
+
+function currentOrder() {
+  let message = ['currentOrder']  
+  return {message}
+}
+
+
+
+
+
+
+
+
+
 
 function listItem() {
   let items = JSON.parse(fs.readFileSync(path.join( __dirname, '../','data', 'item.json'), 'utf8'))
@@ -69,4 +97,7 @@ function listItem() {
   return {message}
 }
 
-listItem()
+function itemSelect() {
+  let message = ['currentOrder']  
+  return {message}
+}
