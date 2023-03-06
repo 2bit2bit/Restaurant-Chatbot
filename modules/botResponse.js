@@ -1,16 +1,15 @@
-const graph = require("./graph").responseGraph;
-
-const response = function name(msg, currentNode = graph.root) {
-  if (!msg) {
-    return graph.root.method();
-  } else {
+const response = function name(msg, currentNode) {
+  if (msg) {
     if (!currentNode.children[msg]) {
-      return { message: ["invalid input"] };
+      let message = {message: ['invalid input']}
+      return [message, currentNode ];
     }
+    
     currentNode = currentNode.children[msg];
   }
-  
-  return currentNode.method();
+
+  let message = currentNode.method()
+  return [message, currentNode]
 };
 
 module.exports = {

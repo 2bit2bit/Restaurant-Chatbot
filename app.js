@@ -33,11 +33,14 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
+const Graph = require("./modules/graph").DecisionGraph;
 const botResponse = require("./modules/botResponse");
 
 io.on("connection", (socket) => {
   let userData;
   const req = socket.request;
+  let decisionGraph = new Graph();
+  let currentNode = decisionGraph.root;
 
   if (req.session.userData) {
     userData = req.session.userData;
@@ -45,10 +48,15 @@ io.on("connection", (socket) => {
     userData = { order: [] };
   }
 
-  socket.emit("chat message", botResponse.response().message);
+  socket.emit(
+    "chat message",
+    botResponse.response(null, currentNode)[0].message
+  );
 
   socket.on("chat message", function (msg) {
-    socket.emit("chat message", botResponse.response(msg).message );
+    let response = botResponse.response(msg, currentNode);
+    socket.emit("chat message", response[0].message);
+    currentNode = response[1];
   });
 
   socket.on("disconnect", () => {

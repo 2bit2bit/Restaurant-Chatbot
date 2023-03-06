@@ -1,46 +1,40 @@
-const { json } = require('express');
-const fs = require('fs')
-const path = require('path')
+const fs = require("fs");
+const path = require("path");
 
 class Node {
-  constructor(index, method, parent) {
+  constructor(index, method, parent, item) {
     this.index = index;
     this.method = method;
+    this.item = item
     this.parent = parent;
     this.children = {};
   }
 
-  addChild(index, data) {
-    let newNode = new Node(index, data, this);
+  addChild(index, method, item) {
+    let newNode = new Node(index, method, this, item);
     newNode.parent.children[index] = newNode;
   }
 }
 
 class DecisionGraph {
-  constructor(method) {
-    this.root = new Node(null, method, null);
+  constructor() {
+    this.root = new Node(null, start, null);
+    this.root.addChild(0, cancel);
+    this.root.addChild(1, listItem);
+    this.root.addChild(99, checkout);
+    this.root.addChild(98, orderHistory);
+    this.root.addChild(97, currentOrder);
+
+    this.root.children[1].addChild(0, this.root[0]);
+    this.root.children[1].addChild(99, this.root.children[1]);
+
+    this.root.children[98].addChild(99, this.root.children[98]);
   }
 }
 
-const responseGraph = new DecisionGraph(start);
-
-responseGraph.root.addChild(0, cancel);
-responseGraph.root.addChild(1, listItem);
-responseGraph.root.addChild(99, checkout);
-responseGraph.root.addChild(98, orderHistory);
-responseGraph.root.addChild(97, currentOrder);
-
-responseGraph.root.children[1].addChild(0, responseGraph.root[0]);
-responseGraph.root.children[1].addChild(1, itemSelect);
-responseGraph.root.children[1].addChild(99, responseGraph.root.children[1]);
-
-responseGraph.root.children[98].addChild(99, responseGraph.root.children[98]);
-
 module.exports = {
-  responseGraph,
+  DecisionGraph,
 };
-
-// console.log(responseGraph.root.method())
 
 /// various method
 
@@ -56,48 +50,42 @@ function start() {
 }
 
 function cancel() {
-  let message = ['Cancel']  
-  return {message}
+  let message = ["Cancel"];
+  return { message };
 }
 
 function checkout() {
-  let message = ['checkout']  
-  return {message}
+  let message = ["checkout"];
+  return { message };
 }
 
 function orderHistory() {
-  let message = ['orderHistory']  
-  return {message}
+  let message = ["orderHistory"];
+  return { message };
 }
 
 function currentOrder() {
-  let message = ['currentOrder']  
-  return {message}
+  let message = ["currentOrder"];
+  return { message };
 }
 
-
-
-
-
-
-
-
-
-
 function listItem() {
-  let items = JSON.parse(fs.readFileSync(path.join( __dirname, '../','data', 'item.json'), 'utf8'))
+  let items = JSON.parse(
+    fs.readFileSync(path.join(__dirname, "../", "data", "item.json"), "utf8")
+  );
 
-  let message = []
   items.forEach((item, index) => {
-    message.push(`select ${index} for ${item.name} @${item.price}`)
+    this.addChild(index + 1, itemSelect, item);
   });
 
-  // add the elements to graph node, implement remove to remove them
-  
-  return {message}
+  let message = [];
+  items.forEach((item, index) => {
+    message.push(`select ${index + 1} for ${item.name} @${item.price}`);
+  });
+  return { message };
 }
 
 function itemSelect() {
-  let message = ['currentOrder']  
-  return {message}
+  let message = [`${this.item.name} added to order`];
+  return { message };
 }
