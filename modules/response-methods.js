@@ -57,8 +57,21 @@ function orderHistory(curOrder, orders) {
   return { message };
 }
 
-function currentOrder() {
-  let message = ["currentOrder"];
+function currentOrder(curOrder) {
+  let message = [];
+  let total = 0;
+  if (!curOrder.length) {
+    message = ["No item in current order!"];
+  } else {
+    curOrder.forEach((order) => {
+      message.push(
+        `${order.qty} ${order.item.name} - ${order.qty * order.item.price}`
+      );
+      total = total + order.qty * order.item.price;
+    });
+    message.push(`----------------`);
+    message.push(`total = ${total}`);
+  }
   return { message };
 }
 
