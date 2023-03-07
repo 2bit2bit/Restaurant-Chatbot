@@ -17,8 +17,25 @@ function cancel() {
 }
 
 function checkout(curOrder, orders) {
-  orders.push({ date: Date.now(), order: curOrder });
-  let message = ["checkout"];
+  let message;
+  if (!curOrder.length) {
+    message = ["No order to place"];
+  } else {
+    orders.push({ date: Date.now(), order: [...curOrder] });
+
+    message = ["Order placed", "--------"];
+    total = 0;
+    curOrder.forEach((order) => {
+      message.push(
+        `${order.qty} ${order.item.name} - ${order.qty * order.item.price}`
+      );
+      total = total + order.qty * order.item.price;
+    });
+    message.push("------");
+    message.push(`total - ${total}`);
+    curOrder.length = 0;
+  }
+
   return { message };
 }
 
