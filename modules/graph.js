@@ -18,7 +18,7 @@ class Node {
 class DecisionGraph {
   constructor() {
     this.root = new Node(null, method.start, null);
-    this.root.addChild(0, method.cancel);
+    this.root.addChild(0, method.cancelOrder);
     this.root.addChild(1, method.listItem);
     this.root.addChild(99, method.checkout);
     this.root.addChild(98, method.orderHistory);

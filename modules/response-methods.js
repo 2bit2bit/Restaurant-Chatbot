@@ -11,8 +11,14 @@ function start() {
   ];
   return { message };
 }
-function cancel() {
-  let message = ["Cancel"];
+function cancelOrder(curOrder) {
+  let message = []
+  if (!curOrder.length) {
+    message = ["Order is empty"]
+  } else {
+    curOrder.length = 0
+  message = ["Current order Cancelled"];
+  }
   return { message };
 }
 
@@ -111,7 +117,7 @@ function PlaceOrder(curOrder) {
 
 module.exports = {
   start,
-  cancel,
+  cancelOrder,
   checkout,
   orderHistory,
   currentOrder,
