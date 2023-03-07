@@ -10,26 +10,27 @@ function start() {
     "Select 0 to cancel order",
   ];
   return { message };
-};
+}
 function cancel() {
   let message = ["Cancel"];
   return { message };
-};
+}
 
-function checkout() {
+function checkout(curOrder, orders) {
+  orders.push({ date: Date.now(), order: curOrder });
   let message = ["checkout"];
   return { message };
-};
+}
 
 function orderHistory() {
   let message = ["orderHistory"];
   return { message };
-};
+}
 
 function currentOrder() {
   let message = ["currentOrder"];
   return { message };
-};
+}
 
 function listItem() {
   let items = JSON.parse(
@@ -45,19 +46,31 @@ function listItem() {
     message.push(`select ${index + 1} for ${item.name} @${item.price}`);
   });
   return { message };
-};
+}
 
 function itemSelect() {
-  let message = [`${this.item.name} added to order`];
-  return { message };
-};
+  for (let i = 1; i <= 9; i++) {
+    this.addChild(i, PlaceOrder, this.item);
+  }
 
+  let message = [`how many ${this.item.name}? [1 to 9]`];
+  return { message };
+}
+
+function PlaceOrder(curOrder) {
+  curOrder.push({
+    item: this.item,
+    qty: this.index,
+  });
+  let message = [`${this.index} ${this.item.name} added to order`];
+  return { message };
+}
 
 module.exports = {
-    start,
-    cancel,
-    checkout,
-    orderHistory,
-    currentOrder,
-    listItem
-}
+  start,
+  cancel,
+  checkout,
+  orderHistory,
+  currentOrder,
+  listItem,
+};

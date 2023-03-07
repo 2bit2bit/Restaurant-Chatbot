@@ -36,16 +36,19 @@ app.get("/", (req, res) => {
 const Graph = require("./modules/graph").DecisionGraph;
 const botResponse = require("./modules/botResponse");
 
+////
+
 io.on("connection", (socket) => {
-  let userData;
   const req = socket.request;
   let decisionGraph = new Graph();
   let currentNode = decisionGraph.root;
+  let curOrder = [];
 
-  if (req.session.userData) {
-    userData = req.session.userData;
+  let orders;
+  if (req.session.orders) {
+    orders = req.session.orders;
   } else {
-    userData = { order: [] };
+    orders = [];
   }
 
   socket.emit(
@@ -54,16 +57,27 @@ io.on("connection", (socket) => {
   );
 
   socket.on("chat message", function (msg) {
-    let response = botResponse.response(msg, currentNode);
+    let response = botResponse.response(msg, currentNode, curOrder, orders);
     socket.emit("chat message", response[0].message);
     currentNode = response[1];
+
+    if (!Object.keys(currentNode.children).length) {
+      decisionGraph = new Graph();
+      currentNode = decisionGraph.root;
+      socket.emit(
+        "chat message",
+        botResponse.response(null, currentNode)[0].message
+      );
+    }
   });
 
   socket.on("disconnect", () => {
-    req.session.userData = userData;
+    req.session.orders = orders
     req.session.save();
   });
 });
+
+////
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
