@@ -26,8 +26,6 @@ class DecisionGraph {
 
     this.root.children[1].addChild(0, this.root[0]);
     this.root.children[1].addChild(99, this.root.children[1]);
-
-    this.root.children[98].addChild(99, this.root.children[98]);
   }
 }
 

@@ -39,8 +39,21 @@ function checkout(curOrder, orders) {
   return { message };
 }
 
-function orderHistory() {
-  let message = ["orderHistory"];
+function orderHistory(curOrder, orders) {
+  let message = ["Your order History", "------------"];
+  let total = 0;
+
+  orders.forEach((orderObject) => {
+    orderObject.order.forEach((item) => {
+      message.push(
+        `${item.qty} ${item.item.name} - ${item.item.price * item.qty} `
+      );
+      total = total + item.item.price * item.qty;
+    });
+    message.push("-------------");
+  });
+  message.push(`total = ${total}`);
+
   return { message };
 }
 
