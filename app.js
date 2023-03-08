@@ -16,7 +16,7 @@ const store = new MongoDBStore({
 });
 
 const sessionMiddleware = session({
-  secret: process.env.SESSION_SECRET || "keyboard cat",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
   store: store,
