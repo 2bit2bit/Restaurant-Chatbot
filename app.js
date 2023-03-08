@@ -1,5 +1,3 @@
-const path = require("path");
-
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -25,12 +23,12 @@ const sessionMiddleware = session({
 });
 const PORT = process.env.PORT || 8080;
 
-app.use(express.static(path.join(__dirname, "public")));
+app.set("view engine", "ejs");  
 app.use(sessionMiddleware);
 io.engine.use(sessionMiddleware);
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.render("index", { url: process.env.URL });
 });
 
 const Graph = require("./modules/graph").DecisionGraph;
@@ -72,7 +70,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    req.session.orders = orders
+    req.session.orders = orders;
     req.session.save();
   });
 });

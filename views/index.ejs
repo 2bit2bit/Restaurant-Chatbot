@@ -167,6 +167,7 @@
         </ul>
         <form id="form" action="">
           <input id="input" type="number" /><button>Send</button>
+          <input type="hidden" id="url" value=<%= url %>> 
         </form>
       </section>
     </main>
@@ -176,11 +177,13 @@
 
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
-      var socket = io();
+      var url = document.getElementById("url").value;
+      var socket = io(url);
 
       var messages = document.getElementById("messages");
       var form = document.getElementById("form");
       var input = document.getElementById("input");
+      
 
       const lineBreak = document.createElement("br");
 
