@@ -50,8 +50,7 @@ io.on("connection", (socket) => {
   socket.emit("chat message", botResponse.response(null, sessionData));
 
   socket.on("chat message", function (msg) {
-    let response = botResponse.response(msg, sessionData);
-    socket.emit("chat message", response);
+    socket.emit("chat message", botResponse.response(msg, sessionData));
 
     if (!Object.keys(sessionData.currentNode.children).length) {
       sessionData.navigationTree = new NavigationTree();

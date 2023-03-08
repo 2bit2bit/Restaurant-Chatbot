@@ -1,18 +1,15 @@
 const response = function name(msg, sessionData) {
-  let currentNode;
-  if (msg) {
-    if (!sessionData.currentNode.children[msg]) {
-      let message = { message: ["invalid input"] };
-      return [message, currentNode];
-    }
-    currentNode = sessionData.currentNode.children[msg];
+  let nextNode;
+  if (!msg) {
+    nextNode = sessionData.currentNode;
   } else {
-    currentNode = sessionData.currentNode;
-    
+    if (!sessionData.currentNode.children[msg]) {
+      return ["invalid input"];
+    }
+    nextNode = sessionData.currentNode.children[msg];
+    sessionData.currentNode = nextNode
   }
-  
-  let message = currentNode.method(sessionData);
-  return message;
+  return nextNode.method(sessionData);
 };
 
 module.exports = {

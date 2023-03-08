@@ -82,36 +82,33 @@ function currentOrder(sessionData) {
 }
 
 function listItem(sessionData) {
-  this.removeChildren();
-  let message = [];
-  let max = 5;
-  let start;
-
-  if (sessionData.listStartIndex) {
-    start = startIndex;
-  } else {
-    start = 0;
-  }
-
   let items = JSON.parse(
     fs.readFileSync(path.join(__dirname, "../", "data", "item.json"), "utf8")
   );
 
-  this.addChild(0, cancel);
-  message.push(`select 0 to cancel`);
+  this.removeChildren();
+  let message = [];
+  let startIndex = sessionData.listStartIndex;
+  let max = items.length - startIndex < 5 ? items.length - startIndex : 5;
+  let stopIndex = max + startIndex;
 
-  for (let index = start; index < max; index++) {
-    this.addChild(index + 1, itemSelect, items[index]);
+  let count = 1;
+  for (startIndex; startIndex < stopIndex; startIndex++) {
+    this.addChild(count, itemSelect, items[startIndex]);
     message.push(
-      `select ${index + 1} for ${items[index].name} @${items[index].price}`
+      `select ${count}: ${items[startIndex].name} @${items[startIndex].price}`
     );
+    count++;
   }
 
-  if (sessionData.listStartIndex + max < items.length) {
+  this.addChild(0, cancel);
+  message.push(`select 0: Cancel`);
+  if (items.length  > stopIndex ) {
     this.addChild(99, listItem);
-    message.push(`select 99 to see more items`);
-  }
+    message.push(`select 99: more items...`);
+  }  
 
+  sessionData.listStartIndex = stopIndex;
   return message;
 }
 
@@ -119,7 +116,6 @@ function itemSelect() {
   for (let i = 1; i <= 9; i++) {
     this.addChild(i, PlaceOrder, this.item);
   }
-
   let message = [`how many ${this.item.name}? [1 to 9]`];
   this.addChild(0, cancel);
   message.push(`select 0 to cancel`);
