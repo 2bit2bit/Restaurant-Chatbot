@@ -13,6 +13,7 @@ const io = new Server(server);
 const store = new MongoDBStore({
   uri: process.env.MONGODB_URI || "mongodb://localhost:27017/mySessions",
   collection: "mySessions",
+  expiresAfterSeconds: 60 * 60 * 24 * 14 
 });
 
 const sessionMiddleware = session({
