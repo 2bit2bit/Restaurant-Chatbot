@@ -27,7 +27,7 @@ function checkout(sessionData) {
   if (!sessionData.curOrder.length) {
     message = ["No order to place"];
   } else {
-    orders.push({ date: Date.now(), order: [...sessionData.curOrder] });
+    sessionData.orders.push({ date: Date.now(), order: [...sessionData.curOrder] });
 
     message = ["Order placed", "--------"];
     total = 0;

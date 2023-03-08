@@ -11,9 +11,9 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const store = new MongoDBStore({
-  uri: process.env.MONGODB_URI || "mongodb://localhost:27017/mySessions",
+  uri: process.env.MONGODB_URI,
   collection: "mySessions",
-  expiresAfterSeconds: 60 * 60 * 24 * 14 
+  expiresAfterSeconds: 60 * 60 * 24 * 14,
 });
 
 const sessionMiddleware = session({
@@ -21,6 +21,7 @@ const sessionMiddleware = session({
   resave: false,
   saveUninitialized: true,
   store: store,
+  cookie: { maxAge: 60 * 60 * 24 * 14 },
 });
 const PORT = process.env.PORT || 8080;
 
