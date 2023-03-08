@@ -12,12 +12,12 @@ function start() {
   return { message };
 }
 function cancelOrder(curOrder) {
-  let message = []
+  let message = [];
   if (!curOrder.length) {
-    message = ["Order is empty"]
+    message = ["Order is empty"];
   } else {
-    curOrder.length = 0
-  message = ["Current order Cancelled"];
+    curOrder.length = 0;
+    message = ["Current order Cancelled"];
   }
   return { message };
 }
@@ -82,18 +82,29 @@ function currentOrder(curOrder) {
 }
 
 function listItem() {
+  this.removeChildren();
+
   let items = JSON.parse(
     fs.readFileSync(path.join(__dirname, "../", "data", "item.json"), "utf8")
   );
 
-  items.forEach((item, index) => {
-    this.addChild(index + 1, itemSelect, item);
-  });
-
   let message = [];
-  items.forEach((item, index) => {
-    message.push(`select ${index + 1} for ${item.name} @${item.price}`);
-  });
+  let start = 0;
+  let max = 5;
+
+  this.addChild(0, cancel);
+  message.push(`select 0 to cancel`);
+
+  for (let index = start; index < max; index++) {
+    this.addChild(index + 1, itemSelect, items[index]);
+    message.push(
+      `select ${index + 1} for ${items[index].name} @${items[index].price}`
+    );
+  }
+
+  this.addChild(99, listItem);
+  message.push(`select 99 to see more items`);
+
   return { message };
 }
 
@@ -103,6 +114,8 @@ function itemSelect() {
   }
 
   let message = [`how many ${this.item.name}? [1 to 9]`];
+  this.addChild(0, cancel);
+  message.push(`select 0 to cancel`);
   return { message };
 }
 
@@ -112,6 +125,11 @@ function PlaceOrder(curOrder) {
     qty: this.index,
   });
   let message = [`${this.index} ${this.item.name} added to order`];
+  return { message };
+}
+
+function cancel() {
+  message = ["-"];
   return { message };
 }
 

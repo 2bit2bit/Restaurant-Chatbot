@@ -8,7 +8,7 @@ const response = function name(msg, currentNode, curOrder, orders) {
     currentNode = currentNode.children[msg];
   }
 
-  let message = currentNode.method(curOrder, orders )
+  let message = currentNode.method(curOrder, orders, currentNode )
   return [message, currentNode]
 };
 

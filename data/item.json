@@ -5,10 +5,34 @@
   },
   {
     "name": "Chips",
-    "price": 600
+    "price": 900
   },
   {
     "name": "Egg",
-    "price": 100
+    "price": 200
+  },
+  {
+    "name": "Golden Yam",
+    "price": 800
+  },
+  {
+    "name": "Peppered Beef",
+    "price": 200
+  },
+  {
+    "name": "Chicken",
+    "price": 600
+  },
+  {
+    "name": "Onion Sauce",
+    "price": 200
+  },
+  {
+    "name": "Meat pie",
+    "price": 400
+  },
+  {
+    "name": "Moi Moi",
+    "price": 300
   }
 ]

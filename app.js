@@ -23,7 +23,7 @@ const sessionMiddleware = session({
 });
 const PORT = process.env.PORT || 8080;
 
-app.set("view engine", "ejs");  
+app.set("view engine", "ejs");
 app.use(sessionMiddleware);
 io.engine.use(sessionMiddleware);
 
@@ -31,15 +31,15 @@ app.get("/", (req, res) => {
   res.render("index", { url: process.env.URL });
 });
 
-const Graph = require("./modules/graph").DecisionGraph;
+const NavigationTree = require("./modules/navigationTree").NavigationTree;
 const botResponse = require("./modules/botResponse");
 
 ////
 
 io.on("connection", (socket) => {
   const req = socket.request;
-  let decisionGraph = new Graph();
-  let currentNode = decisionGraph.root;
+  let navigationTree = new NavigationTree();
+  let currentNode = navigationTree.root;
   let curOrder = [];
 
   let orders;
@@ -60,8 +60,8 @@ io.on("connection", (socket) => {
     currentNode = response[1];
 
     if (!Object.keys(currentNode.children).length) {
-      decisionGraph = new Graph();
-      currentNode = decisionGraph.root;
+      navigationTree = new NavigationTree();
+      currentNode = navigationTree.root;
       socket.emit(
         "chat message",
         botResponse.response(null, currentNode)[0].message
