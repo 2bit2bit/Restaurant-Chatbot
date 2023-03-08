@@ -9,29 +9,29 @@ function start() {
     "Select 97 to see current order",
     "Select 0 to cancel order",
   ];
-  return { message };
+  return message;
 }
-function cancelOrder(curOrder) {
+function cancelOrder(sessionData) {
   let message = [];
-  if (!curOrder.length) {
+  if (!sessionData.curOrder.length) {
     message = ["Order is empty"];
   } else {
-    curOrder.length = 0;
+    sessionData.curOrder.length = 0;
     message = ["Current order Cancelled"];
   }
-  return { message };
+  return message;
 }
 
-function checkout(curOrder, orders) {
+function checkout(sessionData) {
   let message;
-  if (!curOrder.length) {
+  if (!sessionData.curOrder.length) {
     message = ["No order to place"];
   } else {
-    orders.push({ date: Date.now(), order: [...curOrder] });
+    orders.push({ date: Date.now(), order: [...sessionData.curOrder] });
 
     message = ["Order placed", "--------"];
     total = 0;
-    curOrder.forEach((order) => {
+    sessionData.curOrder.forEach((order) => {
       message.push(
         `${order.qty} ${order.item.name} - ${order.qty * order.item.price}`
       );
@@ -39,17 +39,17 @@ function checkout(curOrder, orders) {
     });
     message.push("------");
     message.push(`total - ${total}`);
-    curOrder.length = 0;
+    sessionData.curOrder.length = 0;
   }
 
-  return { message };
+  return message;
 }
 
-function orderHistory(curOrder, orders) {
+function orderHistory(sessionData) {
   let message = ["Your order History", "------------"];
   let total = 0;
 
-  orders.forEach((orderObject) => {
+  sessionData.orders.forEach((orderObject) => {
     orderObject.order.forEach((item) => {
       message.push(
         `${item.qty} ${item.item.name} - ${item.item.price * item.qty} `
@@ -60,16 +60,16 @@ function orderHistory(curOrder, orders) {
   });
   message.push(`total = ${total}`);
 
-  return { message };
+  return message;
 }
 
-function currentOrder(curOrder) {
+function currentOrder(sessionData) {
   let message = [];
   let total = 0;
-  if (!curOrder.length) {
+  if (!sessionData.curOrder.length) {
     message = ["No item in current order!"];
   } else {
-    curOrder.forEach((order) => {
+    sessionData.curOrder.forEach((order) => {
       message.push(
         `${order.qty} ${order.item.name} - ${order.qty * order.item.price}`
       );
@@ -78,19 +78,24 @@ function currentOrder(curOrder) {
     message.push(`----------------`);
     message.push(`total = ${total}`);
   }
-  return { message };
+  return message;
 }
 
-function listItem() {
+function listItem(sessionData) {
   this.removeChildren();
+  let message = [];
+  let max = 5;
+  let start;
+
+  if (sessionData.listStartIndex) {
+    start = startIndex;
+  } else {
+    start = 0;
+  }
 
   let items = JSON.parse(
     fs.readFileSync(path.join(__dirname, "../", "data", "item.json"), "utf8")
   );
-
-  let message = [];
-  let start = 0;
-  let max = 5;
 
   this.addChild(0, cancel);
   message.push(`select 0 to cancel`);
@@ -102,10 +107,12 @@ function listItem() {
     );
   }
 
-  this.addChild(99, listItem);
-  message.push(`select 99 to see more items`);
+  if (sessionData.listStartIndex + max < items.length) {
+    this.addChild(99, listItem);
+    message.push(`select 99 to see more items`);
+  }
 
-  return { message };
+  return message;
 }
 
 function itemSelect() {
@@ -116,21 +123,21 @@ function itemSelect() {
   let message = [`how many ${this.item.name}? [1 to 9]`];
   this.addChild(0, cancel);
   message.push(`select 0 to cancel`);
-  return { message };
+  return message;
 }
 
-function PlaceOrder(curOrder) {
-  curOrder.push({
+function PlaceOrder(sessionData) {
+  sessionData.curOrder.push({
     item: this.item,
     qty: this.index,
   });
   let message = [`${this.index} ${this.item.name} added to order`];
-  return { message };
+  return message;
 }
 
 function cancel() {
   message = ["-"];
-  return { message };
+  return message;
 }
 
 module.exports = {

@@ -39,38 +39,30 @@ const botResponse = require("./modules/botResponse");
 io.on("connection", (socket) => {
   const req = socket.request;
   let navigationTree = new NavigationTree();
-  let currentNode = navigationTree.root;
-  let curOrder = [];
+  const sessionData = {
+    navigationTree: navigationTree,
+    currentNode: navigationTree.root,
+    curOrder: [],
+    listStartIndex: 0,
+    orders: req.session.orders || [],
+  };
 
-  let orders;
-  if (req.session.orders) {
-    orders = req.session.orders;
-  } else {
-    orders = [];
-  }
-
-  socket.emit(
-    "chat message",
-    botResponse.response(null, currentNode)[0].message
-  );
+  socket.emit("chat message", botResponse.response(null, sessionData));
 
   socket.on("chat message", function (msg) {
-    let response = botResponse.response(msg, currentNode, curOrder, orders);
-    socket.emit("chat message", response[0].message);
-    currentNode = response[1];
+    let response = botResponse.response(msg, sessionData);
+    socket.emit("chat message", response);
 
-    if (!Object.keys(currentNode.children).length) {
-      navigationTree = new NavigationTree();
-      currentNode = navigationTree.root;
-      socket.emit(
-        "chat message",
-        botResponse.response(null, currentNode)[0].message
-      );
+    if (!Object.keys(sessionData.currentNode.children).length) {
+      sessionData.navigationTree = new NavigationTree();
+      sessionData.currentNode = sessionData.navigationTree.root;
+      sessionData.listStartIndex = 0;
+      socket.emit("chat message", botResponse.response(null, sessionData));
     }
   });
 
   socket.on("disconnect", () => {
-    req.session.orders = orders;
+    req.session.orders = sessionData.orders;
     req.session.save();
   });
 });

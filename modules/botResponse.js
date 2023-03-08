@@ -1,15 +1,18 @@
-const response = function name(msg, currentNode, curOrder, orders) {
+const response = function name(msg, sessionData) {
+  let currentNode;
   if (msg) {
-    if (!currentNode.children[msg]) {
-      let message = {message: ['invalid input']}
-      return [message, currentNode ];
+    if (!sessionData.currentNode.children[msg]) {
+      let message = { message: ["invalid input"] };
+      return [message, currentNode];
     }
+    currentNode = sessionData.currentNode.children[msg];
+  } else {
+    currentNode = sessionData.currentNode;
     
-    currentNode = currentNode.children[msg];
   }
-
-  let message = currentNode.method(curOrder, orders, currentNode )
-  return [message, currentNode]
+  
+  let message = currentNode.method(sessionData);
+  return message;
 };
 
 module.exports = {
