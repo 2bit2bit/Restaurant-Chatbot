@@ -33,8 +33,8 @@ app.get("/", (req, res) => {
   res.render("index", { url: process.env.URL });
 });
 
-const NavigationTree = require("./modules/navigationTree").NavigationTree;
 const botResponse = require("./modules/botResponse");
+const { NavigationTree } = require("./modules/navigationTree");
 
 ////
 
@@ -42,6 +42,7 @@ io.on("connection", (socket) => {
   const req = socket.request;
   let navigationTree = new NavigationTree();
   const sessionData = {
+    name: req.session.name || "",
     navigationTree: navigationTree,
     currentNode: navigationTree.root,
     curOrder: [],
@@ -52,11 +53,15 @@ io.on("connection", (socket) => {
   socket.emit("chat message", botResponse.response(null, sessionData));
 
   socket.on("chat message", function (msg) {
-    socket.emit("chat message", botResponse.response(msg, sessionData));
+    if (sessionData.currentNode.index === "greeting") {
+      socket.emit("chat message", botResponse.response(msg, sessionData));
+      socket.emit("chat message", botResponse.response(null, sessionData));
+    } else {
+      socket.emit("chat message", botResponse.response(msg, sessionData));
+    }
 
     if (!Object.keys(sessionData.currentNode.children).length) {
-      sessionData.navigationTree = new NavigationTree();
-      sessionData.currentNode = sessionData.navigationTree.root;
+      sessionData.currentNode = sessionData.navigationTree.start;
       sessionData.listStartIndex = 0;
       socket.emit("chat message", botResponse.response(null, sessionData));
     }
@@ -64,6 +69,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     req.session.orders = sessionData.orders;
+    req.session.name = sessionData.name;
     req.session.save();
   });
 });

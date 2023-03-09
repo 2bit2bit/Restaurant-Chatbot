@@ -1,6 +1,25 @@
 const path = require("path");
 const fs = require("fs");
 
+function name(sessionData) {
+  sessionData.currentNode = sessionData.navigationTree.greeting;
+  if (sessionData.name) {
+    return [...greeting(sessionData, sessionData.name), ...start()];
+  } else {
+  return [`Input your name`];
+  }
+}
+
+function greeting(sessionData, msg) {
+  if (!sessionData.name) {
+    sessionData.name = msg;
+  }
+  sessionData.currentNode = sessionData.navigationTree.start;
+  return [
+    `welcome ${sessionData.name}!`
+  ];
+}
+
 function start() {
   message = [
     "Select 1 to Place an order",
@@ -27,7 +46,10 @@ function checkout(sessionData) {
   if (!sessionData.curOrder.length) {
     message = ["No order to place"];
   } else {
-    sessionData.orders.push({ date: Date.now(), order: [...sessionData.curOrder] });
+    sessionData.orders.push({
+      date: Date.now(),
+      order: [...sessionData.curOrder],
+    });
 
     message = ["Order placed", "--------"];
     total = 0;
@@ -103,10 +125,10 @@ function listItem(sessionData) {
 
   this.addChild(0, cancel);
   message.push(`select 0: Cancel`);
-  if (items.length  > stopIndex ) {
+  if (items.length > stopIndex) {
     this.addChild(99, listItem);
     message.push(`select 99: more items...`);
-  }  
+  }
 
   sessionData.listStartIndex = stopIndex;
   return message;
@@ -143,4 +165,6 @@ module.exports = {
   orderHistory,
   currentOrder,
   listItem,
+  name,
+  greeting,
 };
