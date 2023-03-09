@@ -159,7 +159,7 @@
   </head>
   <body>
     <nav>FOODIE</nav>
-    <main>  
+    <main>
       <section class="chat">
         <header>Chatbot</header>
         <ul id="messages">
@@ -183,7 +183,6 @@
       var messages = document.getElementById("messages");
       var form = document.getElementById("form");
       var input = document.getElementById("input");
-      
 
       const lineBreak = document.createElement("br");
 
@@ -206,16 +205,18 @@
       });
 
       socket.on("chat message", function (msg) {
-        if (msg.length == 0) {
-          return
+        if (msg.message.length == 0) {
+          return;
         }
         let li = document.createElement("li");
-        li.classList.add("chat-bot");
-        msg.forEach((element) => {
-          li.insertAdjacentHTML(
-            "beforeend",
-            `${element}</br>`
-          );
+        if (msg.sender === "bot") {
+          li.classList.add("chat-bot");
+        } else {
+          li.classList.add("chat-user");
+        }
+
+        msg.message.forEach((element) => {
+          li.insertAdjacentHTML("beforeend", `${element}</br>`);
         });
         messages.appendChild(li);
         messages.scrollTo(0, messages.scrollHeight);
