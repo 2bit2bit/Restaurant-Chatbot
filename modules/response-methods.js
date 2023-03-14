@@ -3,21 +3,19 @@ const fs = require("fs");
 
 function name(sessionData) {
   sessionData.currentNode = sessionData.navigationTree.greeting;
-  if (sessionData.name) {
-    return [...greeting(sessionData, sessionData.name), ...start()];
+  if (sessionData.userName) {
+    return [greeting(sessionData, sessionData.userName), start()].join("\n");
   } else {
-  return [`Input your name`];
+    return `Input your Username`;
   }
 }
 
 function greeting(sessionData, msg) {
-  if (!sessionData.name) {
-    sessionData.name = msg;
+  if (!sessionData.userName) {
+    sessionData.userName = msg;
   }
   sessionData.currentNode = sessionData.navigationTree.start;
-  return [
-    `welcome ${sessionData.name}!`
-  ];
+  return `welcome ${sessionData.userName}!`;
 }
 
 function start() {
@@ -28,15 +26,16 @@ function start() {
     "Select 97 to see current order",
     "Select 0 to cancel order",
   ];
-  return message;
+  return message.join("\n");
 }
+
 function cancelOrder(sessionData) {
   let message = [];
   if (!sessionData.curOrder.length) {
-    message = ["Order is empty"];
+    message = "Order is empty";
   } else {
     sessionData.curOrder.length = 0;
-    message = ["Current order Cancelled"];
+    message = "Current order Cancelled";
   }
   return message;
 }
@@ -64,25 +63,29 @@ function checkout(sessionData) {
     sessionData.curOrder.length = 0;
   }
 
-  return message;
+  return message.join("\n");
 }
 
 function orderHistory(sessionData) {
   let message = ["Your order History", "------------"];
   let total = 0;
 
-  sessionData.orders.forEach((orderObject) => {
-    orderObject.order.forEach((item) => {
-      message.push(
-        `${item.qty} ${item.item.name} - ${item.item.price * item.qty} `
-      );
-      total = total + item.item.price * item.qty;
+  if (!sessionData.orders.length) {
+    message = ["You haven't placed any order yet"];
+  } else {
+    sessionData.orders.forEach((orderObject) => {
+      orderObject.order.forEach((item) => {
+        message.push(
+          `${item.qty} ${item.item.name} - ${item.item.price * item.qty} `
+        );
+        total = total + item.item.price * item.qty;
+      });
+      message.push("-------------");
     });
-    message.push("-------------");
-  });
-  message.push(`total = ${total}`);
+    message.push(`total = ${total}`);
+  }
 
-  return message;
+  return message.join("\n");
 }
 
 function currentOrder(sessionData) {
@@ -98,12 +101,13 @@ function currentOrder(sessionData) {
       total = total + order.qty * order.item.price;
     });
     message.push(`----------------`);
-    message.push(`total = ${total}`);
+    message.push(`total = #${total}`);
   }
-  return message;
+  return message.join("\n");
 }
 
 function listItem(sessionData) {
+  //can also read from Database instead of file
   let items = JSON.parse(
     fs.readFileSync(path.join(__dirname, "../", "data", "item.json"), "utf8")
   );
@@ -118,7 +122,7 @@ function listItem(sessionData) {
   for (startIndex; startIndex < stopIndex; startIndex++) {
     this.addChild(count, itemSelect, items[startIndex]);
     message.push(
-      `select ${count}: ${items[startIndex].name} @${items[startIndex].price}`
+      `select ${count}: ${items[startIndex].name} #${items[startIndex].price}`
     );
     count++;
   }
@@ -131,7 +135,7 @@ function listItem(sessionData) {
   }
 
   sessionData.listStartIndex = stopIndex;
-  return message;
+  return message.join("\n");
 }
 
 function itemSelect() {
@@ -141,7 +145,7 @@ function itemSelect() {
   let message = [`how many ${this.item.name}? [1 to 9]`];
   this.addChild(0, cancel);
   message.push(`select 0 to cancel`);
-  return message;
+  return message.join("\n");
 }
 
 function PlaceOrder(sessionData) {
@@ -150,12 +154,11 @@ function PlaceOrder(sessionData) {
     qty: this.index,
   });
   let message = [`${this.index} ${this.item.name} added to order`];
-  return message;
+  return message.join("\n");
 }
 
 function cancel() {
-  message = ["-"];
-  return message;
+  return "";
 }
 
 module.exports = {

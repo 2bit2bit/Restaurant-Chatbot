@@ -1,3 +1,8 @@
+/*
+The naviagtion tree track the movement of user.
+the node the user is  determines the valid input and responses.
+*/
+
 const methods = require("./response-methods");
 
 class Node {
@@ -12,19 +17,19 @@ class Node {
   addChild(index, method, item) {
     let newNode = new Node(index, method, this, item);
     newNode.parent.children[index] = newNode;
-    return newNode
+    return newNode;
   }
 
   removeChildren() {
-    this.children = {}
+    this.children = {};
   }
 }
 
 class NavigationTree {
   constructor() {
-    this.root = new Node('root', methods.name, null);
-    this.greeting = this.root.addChild('greeting', methods.greeting)
-    this.start = this.greeting.addChild('start', methods.start)
+    this.root = new Node("root", methods.name, null);
+    this.greeting = this.root.addChild("greeting", methods.greeting);
+    this.start = this.greeting.addChild("start", methods.start);
     this.cancelOrder = this.start.addChild(0, methods.cancelOrder);
     this.listItem = this.start.addChild(1, methods.listItem);
     this.checkout = this.start.addChild(99, methods.checkout);
@@ -33,6 +38,4 @@ class NavigationTree {
   }
 }
 
-module.exports = {
-  NavigationTree,
-};
+module.exports = NavigationTree;

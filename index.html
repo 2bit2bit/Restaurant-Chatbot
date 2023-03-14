@@ -167,7 +167,6 @@
         </ul>
         <form id="form" action="">
           <input id="input" type="text" /><button>Send</button>
-          <input type="hidden" id="url" value=<%= url %>> 
         </form>
       </section>
     </main>
@@ -177,7 +176,6 @@
 
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
-      var url = document.getElementById("url").value;
       var socket = io();
 
       var messages = document.getElementById("messages");
@@ -192,11 +190,6 @@
         if (socket.connected) {
           if (input.value) {
             socket.emit("chat message", input.value);
-            let item = document.createElement("li");
-            item.textContent = input.value;
-            item.classList.add("chat-user");
-            messages.appendChild(item);
-            messages.scrollTo(0, messages.scrollHeight);
             input.value = "";
           }
         } else {
@@ -205,19 +198,21 @@
       });
 
       socket.on("chat message", function (msg) {
-        if (msg.message.length == 0) {
+        console.log(msg);
+        if (!msg || msg.message.length == 0) {
           return;
         }
         let li = document.createElement("li");
+        li.innerText = msg.message;
         if (msg.sender === "bot") {
           li.classList.add("chat-bot");
         } else {
           li.classList.add("chat-user");
         }
 
-        msg.message.forEach((element) => {
-          li.insertAdjacentHTML("beforeend", `${element}</br>`);
-        });
+        // msg.message.forEach((element) => {
+        //   li.insertAdjacentHTML("beforeend", `${element}</br>`);
+        // });
         messages.appendChild(li);
         messages.scrollTo(0, messages.scrollHeight);
       });

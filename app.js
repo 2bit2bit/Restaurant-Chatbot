@@ -1,3 +1,5 @@
+const path = require("path");
+
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -24,71 +26,50 @@ const sessionMiddleware = session({
 });
 const PORT = process.env.PORT || 8080;
 
-app.set("view engine", "ejs");
 app.use(sessionMiddleware);
 io.engine.use(sessionMiddleware);
 
 app.get("/", (req, res) => {
-  res.render("index", { url: process.env.URL });
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 const botResponse = require("./modules/botResponse");
-const { NavigationTree } = require("./modules/navigationTree");
-
+const SessionData = require("./modules/sessionData");
 ////
 let socketRoom = {};
+
 io.on("connection", (socket) => {
-  const req = socket.request;
-  const userID = req.session.id;
+  const session = socket.request.session;
   let sessionData;
 
   //group connection from different tabs
-  if (Object.keys(socketRoom).includes(userID)) {
-    socketRoom[userID].sessionMessages.forEach((message) => {
+  if (socketRoom[session.id]) {
+    socketRoom[session.id].sessionMessages.forEach((message) => {
+      //update this
       socket.emit("chat message", message);
     });
-    sessionData = socketRoom[userID];
-    sessionData.sessionConnection++;
-    socket.join(userID);
+    sessionData = socketRoom[session.id];
+    socket.join(session.id);
   } else {
-    let navigationTree = new NavigationTree();
-    sessionData = {
-      name: req.session.name || "",
-      navigationTree: navigationTree,
-      currentNode: navigationTree.root,
-      curOrder: [],
-      listStartIndex: 0,
-      orders: req.session.orders || [],
-      sessionMessages: [],
-      sessionConnection: 1,
-    };
-    socketRoom[userID] = sessionData;
-    socket.join(userID);
-    socket.emit("chat message", botResponse.response(null, sessionData));
+    sessionData = new SessionData(session, io);
+    socketRoom[session.id] = sessionData;
+    socket.join(session.id);
+    botResponse.response(null, sessionData);
   }
 
   socket.on("chat message", function (msg) {
-    socket.to(userID).emit("chat message", { sender: "user", message: [msg] });
     if (sessionData.currentNode.index === "greeting") {
-      io.to(userID).emit(
-        "chat message",
-        botResponse.response(msg, sessionData)
-      );
-      io.to(userID).emit(
-        "chat message",
-        botResponse.response(null, sessionData)
-      );
+      botResponse.response(msg, sessionData);
+      botResponse.response(null, sessionData);
     } else {
-      io.to(userID).emit(
-        "chat message",
-        botResponse.response(msg, sessionData)
-      );
+      botResponse.response(msg, sessionData);
     }
 
+    //if currentNode has no child node, go back to start node
     if (!Object.keys(sessionData.currentNode.children).length) {
       sessionData.currentNode = sessionData.navigationTree.start;
       sessionData.listStartIndex = 0;
-      io.to(userID).emit(
+      io.to(session.id).emit(
         "chat message",
         botResponse.response(null, sessionData)
       );
@@ -96,13 +77,18 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    if (sessionData.sessionConnection > 1) {
-      sessionData.sessionConnection--;
-    } else {
-      req.session.orders = sessionData.orders;
-      req.session.name = sessionData.name;
-      req.session.save();
-      delete socketRoom[userID];
+    //if no single tab is connected to the room, save sessionData to db and delete the room
+    if (!io.sockets.adapter.rooms.get(session.id)) {
+      
+      session.userName = sessionData.userName;
+      session.orders = sessionData.orders;
+      session.save();
+
+      console.log({
+        userID: session.id,
+        messages: sessionData.sessionMessages,
+      });
+      delete socketRoom[session.id];
     }
   });
 });

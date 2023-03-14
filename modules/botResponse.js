@@ -1,41 +1,35 @@
 const response = (msg, sessionData) => {
-  let responseMessage;
+  //sends message to front end and store in sessionData
+  function sendMessage(sender, message) {
+    let messageData = { sender, message };
+    sessionData.sessionMessages.push(messageData);
+    sessionData.io.to(sessionData.userID).emit("chat message", messageData);
+  }
+
   let nextNode;
   if (!msg) {
     nextNode = sessionData.currentNode;
   } else {
-    sessionData.sessionMessages.push({ sender: "user", message: [msg] });
+    sendMessage("user", msg);
+
     if (sessionData.currentNode.index == "greeting") {
       nextNode = sessionData.currentNode;
-      responseMessage = {
-        sender: "bot",
-        message: nextNode.method(sessionData, msg),
-      };
-      sessionData.sessionMessages.push(responseMessage);
-      return responseMessage;
+      return sendMessage("bot", nextNode.method(sessionData, msg));
     } else {
       if (!sessionData.currentNode.children[msg]) {
-        responseMessage = {
-          sender: "bot",
-          message: [
-            "invalid input",' ',
-            ...sessionData.sessionMessages[
-              sessionData.sessionMessages.length - 2
-            ].message,
-          ],
-        };
-        console.log(responseMessage);
-        sessionData.sessionMessages.push(responseMessage);
-        return responseMessage;
+        sendMessage("bot", ["invalid input"]); //sends invalid input message
+        return sendMessage(
+          "bot",
+          sessionData.sessionMessages[sessionData.sessionMessages.length - 3]
+            .message
+        ); //resends last bot message
       }
       nextNode = sessionData.currentNode.children[msg];
       sessionData.currentNode = nextNode;
     }
   }
 
-  responseMessage = { sender: "bot", message: nextNode.method(sessionData) };
-  sessionData.sessionMessages.push(responseMessage);
-  return responseMessage;
+  sendMessage("bot", nextNode.method(sessionData));
 };
 
 module.exports = {
