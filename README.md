@@ -1,11 +1,10 @@
-//add some image here
 # **Restaurant ChatBot**
 
 **A Restaurant chatbot that assist customers in placing orders for their preferred meals.**
 
 -----
 ### Base URL
-  [Live Link](https://expensive-tam-toad.cyclic.app)
+  [Live Link](https://restaurant-chatbot.onrender.com)
 
 ---
 ## **Setup**
