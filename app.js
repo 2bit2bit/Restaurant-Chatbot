@@ -5,6 +5,8 @@ const http = require("http");
 const { Server } = require("socket.io");
 require("dotenv").config();
 
+const logger = require("./logger/logger");
+
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 
@@ -79,12 +81,10 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     //if no single tab is connected to the room, save sessionData to db and delete the room
     if (!io.sockets.adapter.rooms.get(session.id)) {
-      
       session.userName = sessionData.userName;
       session.orders = sessionData.orders;
       session.save();
-
-      console.log({
+      logger.info({
         userID: session.id,
         messages: sessionData.sessionMessages,
       });
