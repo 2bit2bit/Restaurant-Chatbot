@@ -88,7 +88,11 @@ io.on("connection", (socket) => {
         userID: session.id,
         messages: sessionData.sessionMessages,
       });
-      delete socketRoom[session.id];
+      //clears session data 10 seconds affter disconnection - so that refresh wont clear data
+      setTimeout((sessionID) => {
+        delete socketRoom[sessionID];
+        return "done";
+      }, 5000);
     }
   });
 });

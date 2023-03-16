@@ -118,6 +118,7 @@ The server-side component of the chatbot is responsible for handling incoming re
 
 ### Other Features:
 - Multi-tab management - Sync multiple tabs
+- Session data persist even after refreshing page (resets 5 seconds after disconnecting)
 - Logging - save log data in `./logger` folder
 
 ### Conclustion
